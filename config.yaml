@@ -1,0 +1,9 @@
+artifacts:
+  raw_data_path: artifacts/raw/student_performance.csv
+
+data_source:
+  source_file: data/raw/student_performance.csv
+
+ingestion:
+  allowed_extensions:
+    - .csv
