@@ -1,0 +1,13 @@
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+flask
+mlflow
+pytest
+joblib
+gunicorn
+google-cloud-storage
+kubernetes
+pyyaml
