@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width,
+                   initial-scale=1.0">
+
+    <title>
+        Prediction Page
+    </title>
+
+    <link rel="stylesheet" href="{{ url_for('static',
+          filename='style.css') }}">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>
+            Predict Student Performance
+        </h1>
+
+        <form method="POST">
+
+            <label>
+                Hours Studied
+            </label>
+
+            <input type="number" step="0.1" name="hours_studied" required>
+
+            <label>
+                Previous Scores
+            </label>
+
+            <input type="number" step="0.1" name="previous_scores" required>
+
+            <label>
+                Extracurricular Activities
+            </label>
+
+            <select name="extracurricular_activities" required>
+
+                <option value="Yes">
+                    Yes
+                </option>
+
+                <option value="No">
+                    No
+                </option>
+
+            </select>
+
+            <label>
+                Sleep Hours
+            </label>
+
+            <input type="number" step="0.1" name="sleep_hours" required>
+
+            <label>
+                Sample Question Papers Practiced
+            </label>
+
+            <input type="number" step="0.1" name="sample_question_papers_practiced" required>
+
+            <button type="submit">
+
+                Predict Performance
+
+            </button>
+
+        </form>
+
+        {% if prediction %}
+
+        <div class="result">
+
+            <h2>
+
+                Predicted Performance Score:
+                {{ prediction }}
+
+            </h2>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</body>
+
+</html>
