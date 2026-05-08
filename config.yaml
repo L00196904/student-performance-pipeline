@@ -7,3 +7,25 @@ data_source:
 ingestion:
   allowed_extensions:
     - .csv
+
+artifacts:
+  raw_data_path: artifacts/raw/student_performance.csv
+  processed_dir: artifacts/processed/
+  train_data_path: artifacts/processed/train.csv
+  test_data_path: artifacts/processed/test.csv
+  preprocessor_path: artifacts/processed/preprocessor.pkl
+
+
+data_source:
+  source_file: data/raw/student_performance.csv
+
+
+ingestion:
+  allowed_extensions:
+    - .csv
+
+
+preprocessing:
+  target_column: Performance Index
+  test_size: 0.2
+  random_state: 42
