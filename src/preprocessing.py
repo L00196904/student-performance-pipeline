@@ -56,7 +56,20 @@ class DataPreprocessing:
 
         df = pd.read_csv(self.raw_data_path)
 
+        # Clean column names
+        df.columns = (
+            df.columns
+            .str.strip()
+            .str.replace(" ", "_")
+            .str.replace("/", "_")
+            .str.lower()
+        )
+
         logging.info(f"Dataset shape: {df.shape}")
+
+        logging.info(
+            f"Updated columns: {df.columns.tolist()}"
+        )
 
         return df
 
