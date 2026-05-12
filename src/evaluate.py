@@ -1,6 +1,7 @@
 import os
 import joblib
 import pandas as pd
+import json
 
 from sklearn.metrics import (
     mean_absolute_error,
@@ -148,6 +149,22 @@ class ModelEvaluation:
                 file.write(
                     f"{key}: {value}\n"
                 )
+        
+            # Save JSON file
+        json_metrics_path = (
+            "artifacts/metrics/metrics.json"
+        )
+
+        with open(
+            json_metrics_path,
+            "w"
+        ) as json_file:
+
+            json.dump(
+                metrics,
+                json_file,
+                indent=4
+            )
 
         logging.info(
             f"Metrics saved at: "
