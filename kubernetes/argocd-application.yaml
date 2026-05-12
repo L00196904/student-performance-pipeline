@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+
+kind: Application
+
+metadata:
+  name: student-performance-app
+  namespace: argocd
+
+spec:
+
+  project: default
+
+  source:
+
+    repoURL: https://github.com/L00196904/student-performance-pipeline
+    targetRevision: main
+    path: kubernetes
+
+  destination:
+
+    server: https://kubernetes.default.svc
+    namespace: default
+
+  syncPolicy:
+
+    automated:
+      prune: true
+      selfHeal: true
