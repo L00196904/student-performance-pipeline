@@ -9,7 +9,6 @@
 - Kind
 - Argo CD
 - GitHub Actions
-- MLflow
 - GCP
 - Scikit-learn
 

@@ -1,7 +1,5 @@
 import os
 import joblib
-import mlflow
-import mlflow.sklearn
 import pandas as pd
 
 from sklearn.ensemble import RandomForestRegressor
@@ -21,8 +19,6 @@ from src.upload_artifacts import (
     upload_artifacts
 )
 
-# Use SQLite backend
-mlflow.set_tracking_uri("sqlite:///mlflow.db")
 
 logging = setup_logging()
 
@@ -217,66 +213,6 @@ class ModelTraining:
         )
 
 
-    def log_mlflow(
-        self,
-        model,
-        metrics
-    ):
-
-        logging.info(
-            "Starting MLflow logging"
-        )
-
-        experiment_name = (
-            "Student_Performance_Experiment"
-        )
-
-        mlflow.set_experiment(
-            experiment_name
-        )
-
-        with mlflow.start_run():
-
-            # Log Hyperparameters
-            mlflow.log_param(
-                "model_type",
-                "RandomForestRegressor"
-            )
-
-            mlflow.log_param(
-                "n_estimators",
-                self.n_estimators
-            )
-
-            mlflow.log_param(
-                "max_depth",
-                self.max_depth
-            )
-
-            mlflow.log_param(
-                "random_state",
-                self.random_state
-            )
-
-            # Log Metrics
-            for metric_name, metric_value in metrics.items():
-
-                mlflow.log_metric(
-                    metric_name,
-                    metric_value
-                )
-
-            # Log Model Artifact
-            mlflow.sklearn.log_model(
-                sk_model=model,
-                artifact_path="model"
-            )
-
-            logging.info(
-                "MLflow experiment logging completed"
-            )
-
-
     # Execute Pipeline
     def run(self):
 
@@ -315,12 +251,6 @@ class ModelTraining:
 
         # Save model locally
         self.save_model(model)
-
-        # Log experiment to MLflow
-        self.log_mlflow(
-            model,
-            metrics
-        )
 
         # Upload artifacts to GCP
         upload_artifacts()

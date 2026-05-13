@@ -4,7 +4,6 @@ scikit-learn==1.6.1
 matplotlib
 seaborn
 flask
-mlflow
 pytest
 joblib
 gunicorn
@@ -12,4 +11,3 @@ google-cloud-storage
 kubernetes
 pyyaml
 scipy
-mlflow
