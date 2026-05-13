@@ -3,7 +3,6 @@ name: Deployment Pipeline
 on:
 
   workflow_run:
-
     workflows:
       - Docker Pipeline
     types:
