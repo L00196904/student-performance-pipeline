@@ -1,0 +1,27 @@
+name: Deployment Pipeline
+
+on:
+
+  workflow_run:
+
+    workflows:
+      - Docker Pipeline
+    types:
+      - completed
+
+jobs:
+
+  deployment-validation:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Validate Kubernetes Files
+        run: |
+          ls kubernetes/
+          cat kubernetes/deployment.yaml
+          cat kubernetes/service.yaml

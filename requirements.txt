@@ -1,6 +1,6 @@
 pandas
 numpy
-scikit-learn
+scikit-learn==1.6.1
 matplotlib
 seaborn
 flask
@@ -11,3 +11,5 @@ gunicorn
 google-cloud-storage
 kubernetes
 pyyaml
+scipy
+mlflow
