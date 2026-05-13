@@ -1,10 +1,11 @@
+import os
+
 from src.gcp_utils import (
     GCPStorageManager
 )
 
 
 def upload_artifacts():
-
     storage_manager = (
         GCPStorageManager()
     )
@@ -29,11 +30,21 @@ def upload_artifacts():
 
     for source, destination in artifacts:
 
-        storage_manager.upload_file(
-            source,
-            destination
-        )
+        # Check if file exists
+        if os.path.exists(source):
 
+            storage_manager.upload_file(
+                source,
+                destination
+            )
+            print(
+                f"Uploaded {source} to {destination}"
+            )
+        else:
+
+            print(
+                f"File not found: {source}"
+            )
 
 if __name__ == "__main__":
     upload_artifacts()

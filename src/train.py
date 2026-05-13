@@ -1,7 +1,6 @@
 import os
+import json
 import joblib
-import mlflow
-import mlflow.sklearn
 import pandas as pd
 
 from sklearn.ensemble import RandomForestRegressor
@@ -21,8 +20,6 @@ from src.upload_artifacts import (
     upload_artifacts
 )
 
-# Use SQLite backend
-mlflow.set_tracking_uri("sqlite:///mlflow.db")
 
 logging = setup_logging()
 
@@ -50,6 +47,11 @@ class ModelTraining:
             config["training"]["model_path"]
         )
 
+        # Metrics path
+        self.metrics_path = (
+            "artifacts/metrics/metrics.json"
+        )
+
         # Hyperparameters
         self.random_state = (
             config["training"]["random_state"]
@@ -62,6 +64,7 @@ class ModelTraining:
         self.max_depth = (
             config["training"]["max_depth"]
         )
+
 
     # Load Processed Data
     def load_data(self):
@@ -93,6 +96,7 @@ class ModelTraining:
         return train_df, test_df
 
 
+    # Split Features and Target
     def split_features_target(
         self,
         train_df,
@@ -122,6 +126,8 @@ class ModelTraining:
             y_test
         )
 
+
+    # Train Model
     def train_model(
         self,
         X_train,
@@ -149,6 +155,8 @@ class ModelTraining:
 
         return model
 
+
+    # Evaluate Model
     def evaluate_model(
         self,
         model,
@@ -182,10 +190,10 @@ class ModelTraining:
         )
 
         metrics = {
-            "MAE": mae,
-            "MSE": mse,
-            "RMSE": rmse,
-            "R2_SCORE": r2
+            "MAE": float(mae),
+            "MSE": float(mse),
+            "RMSE": float(rmse),
+            "R2_SCORE": float(r2)
         }
 
         logging.info(
@@ -195,7 +203,11 @@ class ModelTraining:
         return metrics
 
 
-    def save_model(self, model):
+    # Save Model
+    def save_model(
+        self,
+        model
+    ):
 
         logging.info(
             "Saving trained model"
@@ -205,7 +217,9 @@ class ModelTraining:
             self.model_path
         )
 
-        create_directory(model_dir)
+        create_directory(
+            model_dir
+        )
 
         joblib.dump(
             model,
@@ -217,64 +231,38 @@ class ModelTraining:
         )
 
 
-    def log_mlflow(
+    # Save Metrics
+    def save_metrics(
         self,
-        model,
         metrics
     ):
 
         logging.info(
-            "Starting MLflow logging"
+            "Saving evaluation metrics"
         )
 
-        experiment_name = (
-            "Student_Performance_Experiment"
+        metrics_dir = os.path.dirname(
+            self.metrics_path
         )
 
-        mlflow.set_experiment(
-            experiment_name
+        create_directory(
+            metrics_dir
         )
 
-        with mlflow.start_run():
+        with open(
+            self.metrics_path,
+            "w"
+        ) as json_file:
 
-            # Log Hyperparameters
-            mlflow.log_param(
-                "model_type",
-                "RandomForestRegressor"
+            json.dump(
+                metrics,
+                json_file,
+                indent=4
             )
 
-            mlflow.log_param(
-                "n_estimators",
-                self.n_estimators
-            )
-
-            mlflow.log_param(
-                "max_depth",
-                self.max_depth
-            )
-
-            mlflow.log_param(
-                "random_state",
-                self.random_state
-            )
-
-            # Log Metrics
-            for metric_name, metric_value in metrics.items():
-
-                mlflow.log_metric(
-                    metric_name,
-                    metric_value
-                )
-
-            # Log Model Artifact
-            mlflow.sklearn.log_model(
-                sk_model=model,
-                artifact_path="model"
-            )
-
-            logging.info(
-                "MLflow experiment logging completed"
-            )
+        logging.info(
+            f"Metrics saved at: {self.metrics_path}"
+        )
 
 
     # Execute Pipeline
@@ -316,11 +304,8 @@ class ModelTraining:
         # Save model locally
         self.save_model(model)
 
-        # Log experiment to MLflow
-        self.log_mlflow(
-            model,
-            metrics
-        )
+        # Save metrics locally
+        self.save_metrics(metrics)
 
         # Upload artifacts to GCP
         upload_artifacts()
@@ -332,6 +317,7 @@ class ModelTraining:
         print("\n========== MODEL METRICS ==========")
 
         for key, value in metrics.items():
+
             print(f"{key}: {value}")
 
         print("===================================\n")
@@ -340,6 +326,5 @@ class ModelTraining:
 
 
 if __name__ == "__main__":
-    
     trainer = ModelTraining()
     trainer.run()
