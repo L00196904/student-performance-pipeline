@@ -1,18 +1,16 @@
-name: Data Pipeline
+name: CI Pipeline
 
 on:
+  pull_request:
+    branches:
+      - development
 
-  # pull_request:
-  #   branches:
-  #     - development
-
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 jobs:
-
-  data-ingestion-preprocessing:
+  ci-validation:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -36,3 +34,11 @@ jobs:
       - name: Run Data Preprocessing
         run: |
           python -m src.preprocessing
+
+      - name: Run Model Training
+        run: |
+          python -m src.train
+
+      - name: Run Unit Tests
+        run: |
+          pytest tests/
