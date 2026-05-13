@@ -5,6 +5,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
 
   docker:
@@ -45,4 +48,4 @@ jobs:
           git config --global user.name "github-actions"
           git add kubernetes/deployment.yaml
           git commit -m "Updated image tag"
-          git push
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
