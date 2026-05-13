@@ -47,5 +47,5 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
           git add kubernetes/deployment.yaml
-          git commit -m "Updated image tag"
+          git diff --cached --quiet || git commit -m "Updated image tag"
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
