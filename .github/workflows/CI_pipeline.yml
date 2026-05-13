@@ -35,6 +35,15 @@ jobs:
         run: |
           python -m src.preprocessing
 
+      - name: Create GCP Credentials File
+        run: |
+          mkdir -p credentials
+          echo '${{ secrets.GCP_CREDENTIALS }}' > credentials/service-account.json
+
+      - name: Set Google Credentials
+        run: |
+          echo "GOOGLE_APPLICATION_CREDENTIALS=credentials/service-account.json" >> $GITHUB_ENV
+
       - name: Run Model Training
         run: |
           python -m src.train
