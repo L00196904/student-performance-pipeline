@@ -1,4 +1,5 @@
 import os
+import json
 import joblib
 import pandas as pd
 
@@ -46,6 +47,11 @@ class ModelTraining:
             config["training"]["model_path"]
         )
 
+        # Metrics path
+        self.metrics_path = (
+            "artifacts/metrics/metrics.json"
+        )
+
         # Hyperparameters
         self.random_state = (
             config["training"]["random_state"]
@@ -58,6 +64,7 @@ class ModelTraining:
         self.max_depth = (
             config["training"]["max_depth"]
         )
+
 
     # Load Processed Data
     def load_data(self):
@@ -89,6 +96,7 @@ class ModelTraining:
         return train_df, test_df
 
 
+    # Split Features and Target
     def split_features_target(
         self,
         train_df,
@@ -118,6 +126,8 @@ class ModelTraining:
             y_test
         )
 
+
+    # Train Model
     def train_model(
         self,
         X_train,
@@ -145,6 +155,8 @@ class ModelTraining:
 
         return model
 
+
+    # Evaluate Model
     def evaluate_model(
         self,
         model,
@@ -178,10 +190,10 @@ class ModelTraining:
         )
 
         metrics = {
-            "MAE": mae,
-            "MSE": mse,
-            "RMSE": rmse,
-            "R2_SCORE": r2
+            "MAE": float(mae),
+            "MSE": float(mse),
+            "RMSE": float(rmse),
+            "R2_SCORE": float(r2)
         }
 
         logging.info(
@@ -191,7 +203,11 @@ class ModelTraining:
         return metrics
 
 
-    def save_model(self, model):
+    # Save Model
+    def save_model(
+        self,
+        model
+    ):
 
         logging.info(
             "Saving trained model"
@@ -201,7 +217,9 @@ class ModelTraining:
             self.model_path
         )
 
-        create_directory(model_dir)
+        create_directory(
+            model_dir
+        )
 
         joblib.dump(
             model,
@@ -210,6 +228,40 @@ class ModelTraining:
 
         logging.info(
             f"Model saved at: {self.model_path}"
+        )
+
+
+    # Save Metrics
+    def save_metrics(
+        self,
+        metrics
+    ):
+
+        logging.info(
+            "Saving evaluation metrics"
+        )
+
+        metrics_dir = os.path.dirname(
+            self.metrics_path
+        )
+
+        create_directory(
+            metrics_dir
+        )
+
+        with open(
+            self.metrics_path,
+            "w"
+        ) as json_file:
+
+            json.dump(
+                metrics,
+                json_file,
+                indent=4
+            )
+
+        logging.info(
+            f"Metrics saved at: {self.metrics_path}"
         )
 
 
@@ -252,6 +304,9 @@ class ModelTraining:
         # Save model locally
         self.save_model(model)
 
+        # Save metrics locally
+        self.save_metrics(metrics)
+
         # Upload artifacts to GCP
         upload_artifacts()
 
@@ -262,6 +317,7 @@ class ModelTraining:
         print("\n========== MODEL METRICS ==========")
 
         for key, value in metrics.items():
+
             print(f"{key}: {value}")
 
         print("===================================\n")
@@ -270,6 +326,5 @@ class ModelTraining:
 
 
 if __name__ == "__main__":
-    
     trainer = ModelTraining()
     trainer.run()
