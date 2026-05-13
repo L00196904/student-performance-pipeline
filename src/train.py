@@ -17,6 +17,10 @@ from src.utils import (
     setup_logging
 )
 
+from src.upload_artifacts import (
+    upload_artifacts
+)
+
 # Use SQLite backend
 mlflow.set_tracking_uri("sqlite:///mlflow.db")
 
@@ -317,6 +321,9 @@ class ModelTraining:
             model,
             metrics
         )
+
+        # Upload artifacts to GCP
+        upload_artifacts()
 
         logging.info(
             "Training pipeline completed"
