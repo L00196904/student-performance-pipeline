@@ -1,9 +1,13 @@
 name: Data Pipeline
 
 on:
+
+  pull_request:
+    branches:
+      - development
+
   push:
     branches:
-      - develop
       - main
 
 jobs:
