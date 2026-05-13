@@ -33,6 +33,10 @@ jobs:
           docker push \
           ${{ secrets.DOCKER_USERNAME }}/student-performance-app:${{ github.sha }}
 
+      - name: Update Kubernetes Deployment
+        run: |
+          sed -i 's|IMAGE_TAG|${{ github.sha }}|g' kubernetes/deployment.yaml
+
 
        # Commit Updated Manifest
       - name: Commit Manifest Changes
