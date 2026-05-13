@@ -34,7 +34,7 @@ jobs:
       - name: Check Model Performance
         id: performance_check
         run: |
-          python src/check_model_performance.py
+          python monitoring/model_monitor.py
 
   retraining:
 
