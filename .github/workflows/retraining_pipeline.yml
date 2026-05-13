@@ -1,0 +1,78 @@
+name: Deployment Pipeline
+
+on:
+
+  workflow_dispatch:
+
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+
+  model-monitoring:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Evaluation Pipeline
+        run: |
+          python -m src.evaluate
+
+      - name: Check Model Performance
+        id: performance_check
+        run: |
+          python monitoring/model_monitor.py
+
+  retraining:
+
+    needs: model-monitoring
+    if: failure()
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Retraining
+        run: |
+          python -m src.train
+
+      - name: Build Docker Image
+        run: |
+          docker build -t \
+          ${{ secrets.DOCKER_USERNAME }}/student-performance-app:v1 .
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push Updated Image
+        run: |
+          docker push \
+          ${{ secrets.DOCKER_USERNAME }}/student-performance-app:v1

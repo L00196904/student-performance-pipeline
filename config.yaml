@@ -1,0 +1,45 @@
+artifacts:
+  raw_data_path: artifacts/raw/student_performance.csv
+
+data_source:
+  source_file: data/raw/student_performance.csv
+
+ingestion:
+  allowed_extensions:
+    - .csv
+
+artifacts:
+  raw_data_path: artifacts/raw/student_performance.csv
+  processed_dir: artifacts/processed/
+  train_data_path: artifacts/processed/train.csv
+  test_data_path: artifacts/processed/test.csv
+  preprocessor_path: artifacts/processed/preprocessor.pkl
+
+
+data_source:
+  source_file: data/raw/student_performance.csv
+
+
+ingestion:
+  allowed_extensions:
+    - .csv
+
+
+preprocessing:
+  target_column: performance_index
+  test_size: 0.2
+  random_state: 42
+
+training:
+  model_path: artifacts/model/model.pkl
+  random_state: 42
+  n_estimators: 100
+  max_depth: 10
+
+evaluation:
+  metrics_path: artifacts/metrics/metrics.txt
+
+
+prediction:
+  model_path: artifacts/model/model.pkl
+  preprocessor_path: artifacts/processed/preprocessor.pkl
