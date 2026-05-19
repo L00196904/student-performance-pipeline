@@ -1,16 +1,15 @@
-name: Retraining Pipeline
+name: Upload Prediction Logs
 
 on:
 
   schedule:
-
-    - cron: "0 0 * * 0"
+    - cron: "0 0 * * *"
 
   workflow_dispatch:
 
 jobs:
 
-  retraining:
+  upload-logs:
 
     runs-on: ubuntu-latest
 
@@ -26,10 +25,27 @@ jobs:
           python-version: "3.11"
 
       - name: Install Dependencies
+
         run: |
+
           python -m pip install --upgrade pip
+
           pip install -r requirements.txt
 
-      - name: Run Retraining Pipeline
+      - name: Create Service Account File
+
         run: |
-          python -m src.retraining_pipeline
+
+          echo '${{ secrets.GCP_SERVICE_ACCOUNT }}' > service-account.json
+
+      - name: Set Credentials
+
+        run: |
+
+          echo "GOOGLE_APPLICATION_CREDENTIALS=service-account.json" >> $GITHUB_ENV
+
+      - name: Upload Prediction Logs
+
+        run: |
+
+          python -m src.upload_prediction_logs
