@@ -38,14 +38,24 @@ jobs:
 
       - name: Update Kubernetes Deployment
         run: |
-          sed -i 's|IMAGE_TAG|${{ github.sha }}|g' kubernetes/deployment.yaml
+          sed -i "s|image: .*|image: ${{ secrets.DOCKER_USERNAME }}/student-performance-app:${{ github.sha }}|g" kubernetes/deployment.yaml
+
+      - name: Show Updated Manifest
+        run: |
+          cat kubernetes/deployment.yaml
 
 
-       # Commit Updated Manifest
+       # Commit Updated Manifest      
       - name: Commit Manifest Changes
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
+
           git add kubernetes/deployment.yaml
-          git diff --cached --quiet || git commit -m "Updated image tag"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+          if ! git diff --cached --quiet; then
+            git commit -m "Update image tag to ${{ github.sha }}"
+            git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          else
+            echo "No manifest changes detected"
+          fi
