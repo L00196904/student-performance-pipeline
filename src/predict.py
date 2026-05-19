@@ -6,6 +6,10 @@ from src.utils import (
     setup_logging
 )
 
+from src.log_predictions import (
+    log_prediction
+)
+
 logging = setup_logging()
 
 config = read_yaml("config.yaml")
@@ -27,6 +31,9 @@ class PredictionPipeline:
         )
 
     def load_model(self):
+        """
+        Load trained model.
+        """
 
         logging.info(
             "Loading trained model"
@@ -42,8 +49,10 @@ class PredictionPipeline:
 
         return model
 
-
     def load_preprocessor(self):
+        """
+        Load fitted preprocessor.
+        """
 
         logging.info(
             "Loading preprocessor"
@@ -58,34 +67,48 @@ class PredictionPipeline:
         )
 
         return preprocessor
-    
 
-    def predict(self, input_data):
+    def predict(
+        self,
+        input_data
+    ):
+        """
+        Generate prediction and log it.
+        """
 
         logging.info(
             "Starting prediction pipeline"
         )
 
-        # Load artifacts
+        # Load model artifacts
         model = self.load_model()
 
         preprocessor = self.load_preprocessor()
 
-        # Convert input to dataframe
+        # Convert request to dataframe
         input_df = pd.DataFrame(
-    
-        [input_data]
+            [input_data]
         )
 
         # Apply preprocessing
         processed_data = (
-            preprocessor.transform(input_df)
+            preprocessor.transform(
+                input_df
+            )
         )
 
         # Generate prediction
-        prediction = model.predict(
-            processed_data
-        )[0]
+        prediction = (
+            model.predict(
+                processed_data
+            )[0]
+        )
+
+        # Log prediction
+        log_prediction(
+            features=input_data,
+            prediction=prediction
+        )
 
         logging.info(
             f"Prediction generated: {prediction}"
@@ -94,16 +117,14 @@ class PredictionPipeline:
         return prediction
 
 
-
 if __name__ == "__main__":
 
     sample_input = {
-
-    "hours_studied": 7,
-    "previous_scores": 85,
-    "extracurricular_activities": "Yes",
-    "sleep_hours": 7,
-    "sample_question_papers_practiced": 5
+        "hours_studied": 7,
+        "previous_scores": 85,
+        "extracurricular_activities": "Yes",
+        "sleep_hours": 7,
+        "sample_question_papers_practiced": 5
     }
 
     predictor = PredictionPipeline()
@@ -113,6 +134,6 @@ if __name__ == "__main__":
     )
 
     print(
-    f"\nPredicted Score: "
-    f"{prediction:.2f}"
+        f"\nPredicted Score: "
+        f"{prediction:.2f}\n"
     )
