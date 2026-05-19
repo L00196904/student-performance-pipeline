@@ -43,3 +43,6 @@ evaluation:
 prediction:
   model_path: artifacts/model/model.pkl
   preprocessor_path: artifacts/processed/preprocessor.pkl
+
+monitoring:
+  reference_data_path: artifacts/monitoring/reference_data.csv

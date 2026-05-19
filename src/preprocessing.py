@@ -17,10 +17,8 @@ from src.utils import (
     setup_logging
 )
 
-# Setup logger
 logging = setup_logging()
 
-# Load configuration
 config = read_yaml("config.yaml")
 
 
@@ -31,32 +29,60 @@ class DataPreprocessing:
 
     def __init__(self):
 
-        self.raw_data_path = config["artifacts"]["raw_data_path"]
+        self.raw_data_path = (
+            config["artifacts"]["raw_data_path"]
+        )
 
-        self.processed_dir = config["artifacts"]["processed_dir"]
+        self.processed_dir = (
+            config["artifacts"]["processed_dir"]
+        )
 
-        self.train_data_path = config["artifacts"]["train_data_path"]
+        self.train_data_path = (
+            config["artifacts"]["train_data_path"]
+        )
 
-        self.test_data_path = config["artifacts"]["test_data_path"]
+        self.test_data_path = (
+            config["artifacts"]["test_data_path"]
+        )
 
-        self.preprocessor_path = config["artifacts"]["preprocessor_path"]
+        self.preprocessor_path = (
+            config["artifacts"]["preprocessor_path"]
+        )
 
-        self.target_column = config["preprocessing"]["target_column"]
+        self.reference_data_path = (
+            config["monitoring"][
+                "reference_data_path"
+            ]
+        )
 
-        self.test_size = config["preprocessing"]["test_size"]
+        self.target_column = (
+            config["preprocessing"][
+                "target_column"
+            ]
+        )
 
-        self.random_state = config["preprocessing"]["random_state"]
+        self.test_size = (
+            config["preprocessing"][
+                "test_size"
+            ]
+        )
+
+        self.random_state = (
+            config["preprocessing"][
+                "random_state"
+            ]
+        )
 
     def load_data(self):
-        """
-        Load raw dataset.
-        """
 
-        logging.info("Loading raw dataset")
+        logging.info(
+            "Loading raw dataset"
+        )
 
-        df = pd.read_csv(self.raw_data_path)
+        df = pd.read_csv(
+            self.raw_data_path
+        )
 
-        # Clean column names
         df.columns = (
             df.columns
             .str.strip()
@@ -65,56 +91,81 @@ class DataPreprocessing:
             .str.lower()
         )
 
-        logging.info(f"Dataset shape: {df.shape}")
+        logging.info(
+            f"Dataset shape: {df.shape}"
+        )
 
         logging.info(
-            f"Updated columns: {df.columns.tolist()}"
+            f"Updated columns: "
+            f"{df.columns.tolist()}"
         )
 
         return df
 
-    def identify_columns(self, df):
-        """
-        Separate numerical and categorical columns.
-        """
+    def identify_columns(
+        self,
+        df
+    ):
 
-        X = df.drop(columns=[self.target_column])
+        X = df.drop(
+            columns=[
+                self.target_column
+            ]
+        )
 
-        numerical_columns = X.select_dtypes(
-            include=["int64", "float64"]
-        ).columns.tolist()
+        numerical_columns = (
+            X.select_dtypes(
+                include=[
+                    "int64",
+                    "float64"
+                ]
+            )
+            .columns
+            .tolist()
+        )
 
-        categorical_columns = X.select_dtypes(
-            include=["object"]
-        ).columns.tolist()
-
-        logging.info(
-            f"Numerical columns: {numerical_columns}"
+        categorical_columns = (
+            X.select_dtypes(
+                include=[
+                    "object"
+                ]
+            )
+            .columns
+            .tolist()
         )
 
         logging.info(
-            f"Categorical columns: {categorical_columns}"
+            f"Numerical columns: "
+            f"{numerical_columns}"
         )
 
-        return numerical_columns, categorical_columns
+        logging.info(
+            f"Categorical columns: "
+            f"{categorical_columns}"
+        )
+
+        return (
+            numerical_columns,
+            categorical_columns
+        )
 
     def create_preprocessor(
         self,
         numerical_columns,
         categorical_columns
     ):
-        """
-        Create sklearn preprocessing pipeline.
-        """
 
-        logging.info("Creating preprocessing pipeline")
+        logging.info(
+            "Creating preprocessing pipeline"
+        )
 
-        # Numerical pipeline
         numerical_pipeline = Pipeline(
             steps=[
                 (
                     "imputer",
-                    SimpleImputer(strategy="median")
+                    SimpleImputer(
+                        strategy="median"
+                    )
                 ),
                 (
                     "scaler",
@@ -123,7 +174,6 @@ class DataPreprocessing:
             ]
         )
 
-        # Categorical pipeline
         categorical_pipeline = Pipeline(
             steps=[
                 (
@@ -141,40 +191,54 @@ class DataPreprocessing:
             ]
         )
 
-        # Combine pipelines
-        preprocessor = ColumnTransformer(
-            transformers=[
-                (
-                    "num",
-                    numerical_pipeline,
-                    numerical_columns
-                ),
-                (
-                    "cat",
-                    categorical_pipeline,
-                    categorical_columns
-                )
-            ]
+        preprocessor = (
+            ColumnTransformer(
+                transformers=[
+                    (
+                        "num",
+                        numerical_pipeline,
+                        numerical_columns
+                    ),
+                    (
+                        "cat",
+                        categorical_pipeline,
+                        categorical_columns
+                    )
+                ]
+            )
         )
 
         logging.info(
-            "Preprocessing pipeline created successfully"
+            "Preprocessing pipeline created"
         )
 
         return preprocessor
 
-    def split_data(self, df):
-        """
-        Split dataset into train and test sets.
-        """
+    def split_data(
+        self,
+        df
+    ):
 
-        logging.info("Splitting dataset")
+        logging.info(
+            "Splitting dataset"
+        )
 
-        X = df.drop(columns=[self.target_column])
+        X = df.drop(
+            columns=[
+                self.target_column
+            ]
+        )
 
-        y = df[self.target_column]
+        y = df[
+            self.target_column
+        ]
 
-        X_train, X_test, y_train, y_test = train_test_split(
+        (
+            X_train,
+            X_test,
+            y_train,
+            y_test
+        ) = train_test_split(
             X,
             y,
             test_size=self.test_size,
@@ -182,14 +246,50 @@ class DataPreprocessing:
         )
 
         logging.info(
-            f"Train shape: {X_train.shape}"
+            f"Train shape: "
+            f"{X_train.shape}"
         )
 
         logging.info(
-            f"Test shape: {X_test.shape}"
+            f"Test shape: "
+            f"{X_test.shape}"
         )
 
-        return X_train, X_test, y_train, y_test
+        return (
+            X_train,
+            X_test,
+            y_train,
+            y_test
+        )
+
+    def save_reference_data(
+        self,
+        X_train
+    ):
+
+        logging.info(
+            "Saving reference dataset"
+        )
+
+        monitoring_dir = (
+            os.path.dirname(
+                self.reference_data_path
+            )
+        )
+
+        create_directory(
+            monitoring_dir
+        )
+
+        X_train.to_csv(
+            self.reference_data_path,
+            index=False
+        )
+
+        logging.info(
+            f"Reference dataset saved at "
+            f"{self.reference_data_path}"
+        )
 
     def save_processed_data(
         self,
@@ -198,21 +298,40 @@ class DataPreprocessing:
         y_train,
         y_test
     ):
-        """
-        Save processed train and test datasets.
-        """
 
-        logging.info("Saving processed datasets")
+        logging.info(
+            "Saving processed datasets"
+        )
 
-        create_directory(self.processed_dir)
+        create_directory(
+            self.processed_dir
+        )
 
-        train_df = pd.DataFrame(X_train_processed)
+        train_df = pd.DataFrame(
+            X_train_processed
+        )
 
-        train_df["target"] = y_train.reset_index(drop=True)
+        train_df[
+            "target"
+        ] = (
+            y_train
+            .reset_index(
+                drop=True
+            )
+        )
 
-        test_df = pd.DataFrame(X_test_processed)
+        test_df = pd.DataFrame(
+            X_test_processed
+        )
 
-        test_df["target"] = y_test.reset_index(drop=True)
+        test_df[
+            "target"
+        ] = (
+            y_test
+            .reset_index(
+                drop=True
+            )
+        )
 
         train_df.to_csv(
             self.train_data_path,
@@ -225,15 +344,17 @@ class DataPreprocessing:
         )
 
         logging.info(
-            "Processed datasets saved successfully"
+            "Processed datasets saved"
         )
 
-    def save_preprocessor(self, preprocessor):
-        """
-        Save preprocessing object.
-        """
+    def save_preprocessor(
+        self,
+        preprocessor
+    ):
 
-        logging.info("Saving preprocessor object")
+        logging.info(
+            "Saving preprocessor"
+        )
 
         joblib.dump(
             preprocessor,
@@ -241,50 +362,58 @@ class DataPreprocessing:
         )
 
         logging.info(
-            f"Preprocessor saved at: "
+            f"Preprocessor saved at "
             f"{self.preprocessor_path}"
         )
 
     def run(self):
-        """
-        Execute preprocessing pipeline.
-        """
 
         logging.info(
-            "Starting preprocessing pipeline"
+            "Starting preprocessing"
         )
 
-        # Load dataset
         df = self.load_data()
 
-        # Identify columns
-        numerical_columns, categorical_columns = (
-            self.identify_columns(df)
-        )
-
-        # Create preprocessor
-        preprocessor = self.create_preprocessor(
+        (
             numerical_columns,
             categorical_columns
+        ) = self.identify_columns(df)
+
+        preprocessor = (
+            self.create_preprocessor(
+                numerical_columns,
+                categorical_columns
+            )
         )
 
-        # Split dataset
-        X_train, X_test, y_train, y_test = (
-            self.split_data(df)
-        )
+        (
+            X_train,
+            X_test,
+            y_train,
+            y_test
+        ) = self.split_data(df)
 
-        # Fit preprocessor
-        logging.info("Fitting preprocessor")
-
-        X_train_processed = preprocessor.fit_transform(
+        # Save raw training data
+        self.save_reference_data(
             X_train
         )
 
-        X_test_processed = preprocessor.transform(
-            X_test
+        logging.info(
+            "Fitting preprocessor"
         )
 
-        # Save processed datasets
+        X_train_processed = (
+            preprocessor.fit_transform(
+                X_train
+            )
+        )
+
+        X_test_processed = (
+            preprocessor.transform(
+                X_test
+            )
+        )
+
         self.save_processed_data(
             X_train_processed,
             X_test_processed,
@@ -292,11 +421,12 @@ class DataPreprocessing:
             y_test
         )
 
-        # Save preprocessor
-        self.save_preprocessor(preprocessor)
+        self.save_preprocessor(
+            preprocessor
+        )
 
         logging.info(
-            "Preprocessing pipeline completed"
+            "Preprocessing completed"
         )
 
         return (
@@ -308,5 +438,9 @@ class DataPreprocessing:
 
 
 if __name__ == "__main__":
-    preprocessing = DataPreprocessing()
+
+    preprocessing = (
+        DataPreprocessing()
+    )
+
     preprocessing.run()
