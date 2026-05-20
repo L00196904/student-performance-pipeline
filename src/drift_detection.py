@@ -5,6 +5,10 @@ import pandas as pd
 from evidently import Report
 from evidently.presets import DataDriftPreset
 
+from src.gcp_utils import (
+    GCPStorageManager
+)
+
 REFERENCE_DATA = (
     "artifacts/monitoring/reference_data.csv"
 )
@@ -19,6 +23,39 @@ OUTPUT_JSON = (
 
 
 def run_drift_detection():
+    # Create monitoring folder
+    Path(
+        "artifacts/monitoring"
+    ).mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    # Download reference dataset if missing
+    if not Path(
+        REFERENCE_DATA
+    ).exists():
+
+        print(
+            "Reference dataset missing."
+        )
+
+        print(
+            "Downloading from GCP..."
+        )
+
+        storage = (
+            GCPStorageManager()
+        )
+
+        storage.download_file(
+            "monitoring/reference_data.csv",
+            REFERENCE_DATA
+        )
+
+        print(
+            "Reference dataset downloaded."
+        )
 
     # Load datasets
     reference_data = pd.read_csv(
