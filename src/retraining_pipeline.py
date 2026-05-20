@@ -14,6 +14,10 @@ from src.model_comparison import (
     ModelComparison
 )
 
+from src.preprocessing import (
+    DataPreprocessing
+)
+
 
 def run_pipeline():
 
@@ -26,6 +30,16 @@ def run_pipeline():
         )
 
         return
+    
+    print(
+    "\nGenerating processed datasets"
+    )
+
+    processor = (
+        DataPreprocessing()
+    )
+
+    processor.run()
 
     print(
         "\nStarting retraining"
