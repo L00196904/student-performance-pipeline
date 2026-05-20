@@ -17,6 +17,9 @@ from src.utils import (
     setup_logging
 )
 
+from src.gcp_utils import GCPStorageManager
+
+
 logging = setup_logging()
 
 config = read_yaml("config.yaml")
@@ -78,6 +81,24 @@ class DataPreprocessing:
         logging.info(
             "Loading raw dataset"
         )
+
+        if not os.path.exists(
+            self.raw_data_path
+        ):
+
+            os.makedirs(
+                os.path.dirname(
+                    self.raw_data_path
+                ),
+                exist_ok=True
+            )
+
+            gcp = GCPStorageManager()
+
+            gcp.download_file(
+                "raw/student_performance.csv",
+                self.raw_data_path
+            )
 
         df = pd.read_csv(
             self.raw_data_path
