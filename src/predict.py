@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 import joblib
 import pandas as pd
 
@@ -12,7 +15,9 @@ from src.log_predictions import (
 
 logging = setup_logging()
 
-config = read_yaml("config.yaml")
+config = read_yaml(
+    "config.yaml"
+)
 
 
 class PredictionPipeline:
@@ -22,25 +27,51 @@ class PredictionPipeline:
 
     def __init__(self):
 
+        # Project root directory
+        self.base_dir = (
+            Path(__file__)
+            .resolve()
+            .parent
+            .parent
+        )
+
+        # Absolute paths
         self.model_path = (
+            self.base_dir /
             config["prediction"]["model_path"]
         )
 
         self.preprocessor_path = (
+            self.base_dir /
             config["prediction"]["preprocessor_path"]
         )
 
     def load_model(self):
-        """
-        Load trained model.
-        """
 
         logging.info(
-            "Loading trained model"
+            f"Loading model from: "
+            f"{self.model_path}"
         )
 
-        model = joblib.load(
+        print(
+            "\nCurrent Working Directory:",
+            os.getcwd()
+        )
+
+        print(
+            "Model Path:",
             self.model_path
+        )
+
+        if not self.model_path.exists():
+
+            raise FileNotFoundError(
+                f"Model file not found: "
+                f"{self.model_path}"
+            )
+
+        model = joblib.load(
+            str(self.model_path)
         )
 
         logging.info(
@@ -50,16 +81,26 @@ class PredictionPipeline:
         return model
 
     def load_preprocessor(self):
-        """
-        Load fitted preprocessor.
-        """
 
         logging.info(
-            "Loading preprocessor"
+            f"Loading preprocessor from: "
+            f"{self.preprocessor_path}"
         )
 
-        preprocessor = joblib.load(
+        print(
+            "Preprocessor Path:",
             self.preprocessor_path
+        )
+
+        if not self.preprocessor_path.exists():
+
+            raise FileNotFoundError(
+                f"Preprocessor file not found: "
+                f"{self.preprocessor_path}"
+            )
+
+        preprocessor = joblib.load(
+            str(self.preprocessor_path)
         )
 
         logging.info(
@@ -72,9 +113,6 @@ class PredictionPipeline:
         self,
         input_data
     ):
-        """
-        Generate prediction and log it.
-        """
 
         logging.info(
             "Starting prediction pipeline"
@@ -83,7 +121,9 @@ class PredictionPipeline:
         # Load model artifacts
         model = self.load_model()
 
-        preprocessor = self.load_preprocessor()
+        preprocessor = (
+            self.load_preprocessor()
+        )
 
         # Convert request to dataframe
         input_df = pd.DataFrame(
@@ -111,7 +151,8 @@ class PredictionPipeline:
         )
 
         logging.info(
-            f"Prediction generated: {prediction}"
+            f"Prediction generated: "
+            f"{prediction}"
         )
 
         return prediction
@@ -120,17 +161,28 @@ class PredictionPipeline:
 if __name__ == "__main__":
 
     sample_input = {
+
         "hours_studied": 7,
+
         "previous_scores": 85,
-        "extracurricular_activities": "Yes",
+
+        "extracurricular_activities":
+        "Yes",
+
         "sleep_hours": 7,
-        "sample_question_papers_practiced": 5
+
+        "sample_question_papers_practiced":
+        5
     }
 
-    predictor = PredictionPipeline()
+    predictor = (
+        PredictionPipeline()
+    )
 
-    prediction = predictor.predict(
-        sample_input
+    prediction = (
+        predictor.predict(
+            sample_input
+        )
     )
 
     print(
