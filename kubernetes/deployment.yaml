@@ -24,7 +24,7 @@ spec:
 
       - name: student-performance-container
 
-        image: l00196904/student-performance-app:6e5d0b6cb1d1088b2fb033de8ad7e918c50897af
+        image: l00196904/student-performance-app:a5476cefedc2d76c359d427bf0e966101c7de049
 
         imagePullPolicy: Always
 
