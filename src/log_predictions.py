@@ -7,7 +7,7 @@ LOG_FILE = (
     "artifacts/predictions/predictions.jsonl"
 )
 
-TRIGGER_THRESHOLD = 10
+TRIGGER_THRESHOLD = 5
 
 
 def trigger_pipeline():
