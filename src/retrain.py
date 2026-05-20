@@ -15,6 +15,10 @@ from src.utils import (
     setup_logging
 )
 
+from sklearn.model_selection import (
+    train_test_split
+)
+
 logging = setup_logging()
 
 config = read_yaml("config.yaml")
@@ -52,6 +56,76 @@ class ModelRetraining:
             config["training"]["max_depth"]
         )
 
+    def create_train_test_data(self):
+
+        logging.info(
+            "Creating train/test datasets"
+        )
+
+        dataset = pd.read_csv(
+            config["data_source"][
+                "source_file"
+            ]
+        )
+
+        # Rename raw dataset columns
+        dataset.columns = [
+
+            "hours_studied",
+
+            "previous_scores",
+
+            "extracurricular_activities",
+
+            "sleep_hours",
+
+            "sample_question_papers_practiced",
+
+            "target"
+        ]
+
+        dataset[
+            "extracurricular_activities"
+        ] = dataset[
+            "extracurricular_activities"
+        ].map(
+            {
+                "Yes": 1,
+                "No": 0
+            }
+        )
+
+        train_df, test_df = train_test_split(
+
+            dataset,
+
+            test_size=config[
+                "preprocessing"
+            ]["test_size"],
+
+            random_state=config[
+                "preprocessing"
+            ]["random_state"]
+        )
+
+        create_directory(
+            "artifacts/processed"
+        )
+
+        train_df.to_csv(
+            self.train_data_path,
+            index=False
+        )
+
+        test_df.to_csv(
+            self.test_data_path,
+            index=False
+        )
+
+        logging.info(
+            "Train/test datasets created"
+        )
+
     def load_data(self):
 
         logging.info(
@@ -73,6 +147,12 @@ class ModelRetraining:
         train_df,
         test_df
     ):
+
+        target_column = (
+            config["preprocessing"][
+                "target_column"
+            ]
+        )
 
         X_train = train_df.drop(
             columns=["target"]
@@ -190,6 +270,8 @@ class ModelRetraining:
         logging.info(
             "Starting retraining pipeline"
         )
+
+        self.create_train_test_data()
 
         train_df, test_df = (
             self.load_data()
