@@ -13,6 +13,10 @@ from src.utils import (
     setup_logging
 )
 
+from src.upload_artifacts import (
+    upload_artifacts
+)
+
 logging = setup_logging()
 
 config = read_yaml(
@@ -196,15 +200,28 @@ class ModelComparison:
 
             self.promote_candidate()
 
-        else:
+            upload_artifacts()
 
             print(
-                "Champion retained"
+                "New production model "
+                "uploaded to GCP"
             )
+
+            print(
+                "=====================\n"
+            )
+
+            return True
+
+        print(
+            "Champion retained"
+        )
 
         print(
             "=====================\n"
         )
+
+        return False
 
 
 if __name__ == "__main__":

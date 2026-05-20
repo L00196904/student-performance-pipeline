@@ -87,6 +87,43 @@ def predict():
         prediction=prediction
     )
 
+
+@app.route("/monitor")
+def monitor():
+
+    from src.prepare_monitoring_data import (
+        prepare_monitoring_data
+    )
+
+    from src.drift_detection import (
+        run_drift_detection
+    )
+
+    prepare_monitoring_data()
+
+    drift_detected = (
+        run_drift_detection()
+    )
+
+    return {
+        "drift_detected":
+        drift_detected
+    }
+
+@app.route("/retrain")
+def retrain():
+
+    from src.retraining_pipeline import (
+        run_pipeline
+    )
+
+    run_pipeline()
+
+    return {
+        "status":
+        "Retraining completed"
+    }
+
 if __name__ == "__main__":
 
     app.run(

@@ -162,6 +162,28 @@ def run_drift_detection():
             "Snapshot data."
         )
 
+    drift_share = 0.0
+
+    for metric in report_data["metrics"]:
+
+        if (
+            "DriftedColumnsCount"
+            in metric["metric_name"]
+        ):
+
+            drift_share = (
+                metric["value"]["share"]
+            )
+
+    print(
+        f"\nDrift Share: "
+        f"{drift_share}"
+    )
+
+    return drift_share > 0.30
+
+
+
 
 if __name__ == "__main__":
 
