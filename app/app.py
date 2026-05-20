@@ -4,6 +4,13 @@ from flask import (
     request
 )
 
+from src.download_artifacts import (
+    download_artifacts
+)
+
+# Download latest artifacts
+download_artifacts()
+
 from src.predict import PredictionPipeline
 
 app = Flask(__name__)
